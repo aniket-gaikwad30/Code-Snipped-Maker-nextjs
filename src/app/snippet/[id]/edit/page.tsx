@@ -3,13 +3,25 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import React from "react";
 
-const EditPageSnippet = async ({ params }: { params: { id: string } }) => {
-  const id = parseInt(params.id);
+interface EditPageSnippetProps {
+  params: Promise<{ id: string }>;
+}
+
+const EditPageSnippet = async ({ params }: EditPageSnippetProps) => {
+  const { id } = await params;
+  const snippetId = parseInt(id);
+
+  if (isNaN(snippetId)) {
+    return notFound();
+  }
+
   const snippet = await prisma.snippet.findUnique({
-    where: { id },
+    where: { id: snippetId },
   });
 
-  if (!snippet) return notFound();
+  if (!snippet) {
+    return notFound();
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">

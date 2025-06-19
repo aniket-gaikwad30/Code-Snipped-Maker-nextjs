@@ -6,13 +6,14 @@ import type { Snippet } from "@prisma/client";
 import { Button } from "./button";
 import { saveSnippet } from "@/actions";
 import { Copy, Moon, Sun } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 function EditSnippet({ snippet }: { snippet: Snippet }) {
   const [code, setCode] = React.useState(snippet.code);
   const [language, setLanguage] = React.useState("javascript");
   const [theme, setTheme] = React.useState<"vs-dark" | "light">("vs-dark");
-
-  const saveSnippetAction = saveSnippet.bind(null, snippet.id, code);
+  const [isSaving, setIsSaving] = React.useState(false);
+  const router = useRouter();
 
   const handleEditorChange = (value: string = "") => {
     setCode(value);
@@ -32,9 +33,27 @@ function EditSnippet({ snippet }: { snippet: Snippet }) {
     setTheme((prev) => (prev === "vs-dark" ? "light" : "vs-dark"));
   };
 
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    
+    try {
+      const result = await saveSnippet(snippet.id, code);
+      if (result.success) {
+        router.push(`/snippet/${snippet.id}`);
+      } else {
+        alert(result.message || "Failed to save snippet");
+      }
+    } catch {
+      alert("An error occurred while saving");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
-      <form action={saveSnippetAction} className="flex flex-col gap-4">
+      <form onSubmit={handleSave} className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h1 className="font-bold text-lg">Your Code Editor</h1>
           <div className="flex gap-2">
@@ -50,7 +69,9 @@ function EditSnippet({ snippet }: { snippet: Snippet }) {
               )}
               {theme === "vs-dark" ? "Light" : "Dark"}
             </Button>
-            <Button type="submit">Save</Button>
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save"}
+            </Button>
           </div>
         </div>
 
