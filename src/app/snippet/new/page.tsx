@@ -14,35 +14,65 @@ function TagInput({ tags, setTags }: { tags: string[]; setTags: (tags: string[])
   
   const addTag = (e: React.FormEvent) => {
     e.preventDefault();
-    if (input && !tags.includes(input)) {
-      setTags([...tags, input]);
+    const trimmedInput = input.trim().toLowerCase();
+    if (trimmedInput && !tags.includes(trimmedInput)) {
+      setTags([...tags, trimmedInput]);
       setInput("");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const trimmedInput = input.trim().toLowerCase();
+      if (trimmedInput && !tags.includes(trimmedInput)) {
+        setTags([...tags, trimmedInput]);
+        setInput("");
+      }
     }
   };
   
   const removeTag = (tag: string) => setTags(tags.filter((t) => t !== tag));
   
   return (
-    <div className="flex flex-wrap gap-2 bg-white/30 dark:bg-gray-800/30 rounded-lg px-2 py-1 backdrop-blur-md">
-      {tags.map((tag) => (
-        <span key={tag} className="flex items-center gap-1 bg-gradient-to-r from-purple-400 to-blue-400 text-white px-2 py-0.5 rounded-full text-xs font-mono animate-in fade-in">
-          {tag}
-          <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-red-300">
-            <X size={12} />
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 bg-white/30 dark:bg-gray-800/30 rounded-lg px-3 py-2 backdrop-blur-md border border-gray-300 dark:border-gray-600">
+        {tags.map((tag) => (
+          <span key={tag} className="flex items-center gap-1 bg-gradient-to-r from-purple-400 to-blue-400 text-white px-3 py-1 rounded-full text-sm font-mono animate-in fade-in">
+            {tag}
+            <button 
+              type="button" 
+              onClick={() => removeTag(tag)} 
+              className="ml-1 hover:text-red-300 transition-colors"
+              title="Remove tag"
+            >
+              <X size={14} />
+            </button>
+          </span>
+        ))}
+        <form onSubmit={addTag} className="flex items-center flex-1 min-w-0">
+          <input
+            className="bg-transparent outline-none text-sm px-2 py-1 font-mono flex-1 min-w-0"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={tags.length === 0 ? "Type a tag and press Enter or click +" : "Add another tag..."}
+          />
+          <button 
+            type="submit" 
+            className="ml-2 text-blue-400 hover:text-blue-600 transition-colors p-1 rounded"
+            title="Add tag"
+            disabled={!input.trim()}
+          >
+            <Plus size={16} />
           </button>
-        </span>
-      ))}
-      <form onSubmit={addTag} className="flex items-center">
-        <input
-          className="bg-transparent outline-none text-sm px-1 font-mono"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          placeholder="Add tag"
-        />
-        <button type="submit" className="ml-1 text-blue-400">
-          <Plus size={14} />
-        </button>
-      </form>
+        </form>
+      </div>
+      {tags.length > 0 && (
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {tags.length} tag{tags.length !== 1 ? 's' : ''} added
+        </p>
+      )}
     </div>
   );
 }

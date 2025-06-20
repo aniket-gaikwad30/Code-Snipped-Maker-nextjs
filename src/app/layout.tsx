@@ -4,7 +4,6 @@ import "./globals.css";
 import { ClientProviders } from "@/components/ClientProviders";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Toaster } from "react-hot-toast";
 import { Code, Sparkles } from "lucide-react";
 
 const geistSans = Geist({
@@ -31,15 +30,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ClientProviders>
-          <Toaster position="top-right" toastOptions={{
-            className: 'bg-white/90 dark:bg-gray-900/90 text-gray-900 dark:text-white rounded-2xl shadow-2xl backdrop-blur-md font-sans border border-gray-200 dark:border-gray-700',
-            duration: 3000,
-            style: {
-              background: 'rgba(255, 255, 255, 0.9)',
-              backdropFilter: 'blur(20px)',
-            },
-          }} />
-          
           {/* Enhanced NavBar */}
           <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-700 backdrop-blur-md shadow-lg">
             <div className="container mx-auto px-6 py-4">

@@ -3,10 +3,9 @@
 "use client";
 
 import React, { useState } from "react";
-import Highlight, { defaultProps } from "prism-react-renderer";
-import theme from "prism-react-renderer/themes/duotoneDark";
+import { Highlight, themes } from "prism-react-renderer";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Copy, ArrowLeft, Code, Tag } from "lucide-react";
+import { Check, Copy, ArrowLeft, Code, Tag, Edit } from "lucide-react";
 import Link from "next/link";
 
 type SnippetProps = {
@@ -77,39 +76,51 @@ const SnippetClient = ({ snippet }: SnippetProps) => {
                 ))}
               </div>
 
-              {/* Copy Button */}
-              <button
-                onClick={handleCopy}
-                className="bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-xl shadow-lg hover:bg-white/30 transition-all duration-200 flex items-center gap-2 group"
-              >
-                <AnimatePresence mode="wait">
-                  {copied ? (
-                    <motion.span
-                      key="check"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{ duration: 0.2 }}
-                      className="flex items-center gap-2"
-                    >
-                      <Check className="w-5 h-5" />
-                      Copied!
-                    </motion.span>
-                  ) : (
-                    <motion.span
-                      key="copy"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{ duration: 0.2 }}
-                      className="flex items-center gap-2"
-                    >
-                      <Copy className="w-5 h-5" />
-                      Copy Code
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </button>
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                {/* Edit Button */}
+                <Link
+                  href={`/snippet/${snippet.id}/edit`}
+                  className="bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-xl shadow-lg hover:bg-white/30 transition-all duration-200 flex items-center gap-2 group"
+                >
+                  <Edit className="w-5 h-5" />
+                  Edit
+                </Link>
+
+                {/* Copy Button */}
+                <button
+                  onClick={handleCopy}
+                  className="bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-xl shadow-lg hover:bg-white/30 transition-all duration-200 flex items-center gap-2 group"
+                >
+                  <AnimatePresence mode="wait">
+                    {copied ? (
+                      <motion.span
+                        key="check"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex items-center gap-2"
+                      >
+                        <Check className="w-5 h-5" />
+                        Copied!
+                      </motion.span>
+                    ) : (
+                      <motion.span
+                        key="copy"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex items-center gap-2"
+                      >
+                        <Copy className="w-5 h-5" />
+                        Copy Code
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -126,8 +137,7 @@ const SnippetClient = ({ snippet }: SnippetProps) => {
               </div>
               
               <Highlight
-                {...defaultProps}
-                theme={theme}
+                theme={themes.duotoneDark}
                 code={snippet.code.trim()}
                 language="tsx"
               >

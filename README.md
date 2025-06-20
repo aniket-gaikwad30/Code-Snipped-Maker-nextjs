@@ -62,8 +62,8 @@ A beautiful, modern web application for creating, organizing, and sharing code s
    ```
 
 5. **Run the development server**
-   ```bash
-   npm run dev
+```bash
+npm run dev
    ```
 
 6. **Open your browser**

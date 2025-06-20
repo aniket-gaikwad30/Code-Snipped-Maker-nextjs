@@ -1,5 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @custom-variant dark (&:is(.dark *));
 
@@ -114,7 +115,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-gray-200 dark:border-gray-700;
   }
   body {
     @apply bg-background text-foreground;
@@ -187,10 +188,15 @@
 
 /* Gradient text */
 .gradient-text {
+  color: #1f2937; /* A dark gray color for light mode */
+}
+
+.dark .gradient-text {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: transparent;
 }
 
 /* Card hover effects */
@@ -219,6 +225,10 @@
 
 /* Neon glow effect */
 .neon-glow {
+  text-shadow: none;
+}
+
+.dark .neon-glow {
   text-shadow: 0 0 10px rgba(102, 126, 234, 0.8),
                0 0 20px rgba(102, 126, 234, 0.6),
                0 0 30px rgba(102, 126, 234, 0.4);
@@ -254,13 +264,12 @@
 }
 
 .loading-dots::after {
-  content: '...';
-  animation: loading-dots 1.5s steps(5, end) infinite;
+  content: '';
+  animation: loading-dots 1.5s infinite;
 }
 
-/* Dark mode adjustments */
 .dark body {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
 }
 
 .dark .glossy-btn {
