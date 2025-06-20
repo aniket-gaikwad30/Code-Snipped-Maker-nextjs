@@ -34,6 +34,8 @@ function TagInput({ tags, setTags }: { tags: string[]; setTags: (tags: string[])
   
   const removeTag = (tag: string) => setTags(tags.filter((t) => t !== tag));
   
+  const isInputValid = input.trim() && !tags.includes(input.trim().toLowerCase());
+  
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2 bg-white/30 dark:bg-gray-800/30 rounded-lg px-3 py-2 backdrop-blur-md border border-gray-300 dark:border-gray-600">
@@ -60,9 +62,13 @@ function TagInput({ tags, setTags }: { tags: string[]; setTags: (tags: string[])
           />
           <button 
             type="submit" 
-            className="ml-2 text-blue-400 hover:text-blue-600 transition-colors p-1 rounded"
-            title="Add tag"
-            disabled={!input.trim()}
+            className={`ml-2 p-1 rounded transition-all duration-200 ${
+              isInputValid 
+                ? "text-blue-600 hover:text-blue-800 hover:bg-blue-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/30" 
+                : "text-gray-400 cursor-not-allowed"
+            }`}
+            title={isInputValid ? "Add tag" : "Enter a valid tag"}
+            disabled={!isInputValid}
           >
             <Plus size={16} />
           </button>
@@ -71,6 +77,11 @@ function TagInput({ tags, setTags }: { tags: string[]; setTags: (tags: string[])
       {tags.length > 0 && (
         <p className="text-sm text-gray-600 dark:text-gray-400">
           {tags.length} tag{tags.length !== 1 ? 's' : ''} added
+        </p>
+      )}
+      {!isInputValid && input.trim() && (
+        <p className="text-sm text-orange-600 dark:text-orange-400">
+          Tag already exists or is empty
         </p>
       )}
     </div>

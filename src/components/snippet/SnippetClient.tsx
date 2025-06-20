@@ -5,8 +5,10 @@
 import React, { useState } from "react";
 import { Highlight, themes } from "prism-react-renderer";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Copy, ArrowLeft, Code, Tag, Edit } from "lucide-react";
+import { Check, Copy, ArrowLeft, Code, Tag, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { deleteSnippet } from "@/actions";
+import { useRouter } from "next/navigation";
 
 type SnippetProps = {
   snippet: {
@@ -19,6 +21,8 @@ type SnippetProps = {
 
 const SnippetClient = ({ snippet }: SnippetProps) => {
   const [copied, setCopied] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
   
   // Parse tags from JSON string
   const tags = (() => {
@@ -36,6 +40,27 @@ const SnippetClient = ({ snippet }: SnippetProps) => {
       setTimeout(() => setCopied(false), 1500);
     } catch {
       // handle error silently
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this snippet? This action cannot be undone.")) {
+      return;
+    }
+    
+    setIsDeleting(true);
+    try {
+      const result = await deleteSnippet(snippet.id);
+      if (result && result.message) {
+        // If there's an error message, show it
+        alert(result.message);
+        setIsDeleting(false);
+      }
+      // If no result or no message, the redirect should happen automatically
+    } catch (error) {
+      console.error("Error deleting snippet:", error);
+      alert("Failed to delete snippet. Please try again.");
+      setIsDeleting(false);
     }
   };
 
@@ -119,6 +144,16 @@ const SnippetClient = ({ snippet }: SnippetProps) => {
                       </motion.span>
                     )}
                   </AnimatePresence>
+                </button>
+
+                {/* Delete Button */}
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="bg-red-500/20 backdrop-blur-md text-white px-6 py-3 rounded-xl shadow-lg hover:bg-red-500/30 transition-all duration-200 flex items-center gap-2 group disabled:opacity-50"
+                >
+                  <Trash2 className="w-5 h-5" />
+                  {isDeleting ? "Deleting..." : "Delete"}
                 </button>
               </div>
             </div>

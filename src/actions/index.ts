@@ -77,16 +77,41 @@ export async function saveSnippet(id: number, code: string) {
 }
 
 export async function deleteSnippet(id: number) {
+  console.log("Attempting to delete snippet with ID:", id);
+  
+  if (!id || isNaN(id)) {
+    console.log("Invalid snippet ID:", id);
+    return { message: "Invalid snippet ID" };
+  }
+
   try {
+    // First check if the snippet exists
+    console.log("Checking if snippet exists...");
+    const snippet = await prisma.snippet.findUnique({
+      where: { id },
+    });
+
+    if (!snippet) {
+      console.log("Snippet not found with ID:", id);
+      return { message: "Snippet not found" };
+    }
+
+    console.log("Snippet found, deleting...", snippet.title);
+    // Delete the snippet
     await prisma.snippet.delete({
       where: { id },
     });
 
+    console.log("Snippet deleted successfully");
     revalidatePath("/");
   } catch (error) {
     console.error("Error deleting snippet:", error);
+    if (error instanceof Error) {
+      return { message: `Failed to delete snippet: ${error.message}` };
+    }
     return { message: "Failed to delete snippet. Please try again." };
   }
 
+  console.log("Redirecting after successful deletion");
   redirect("/");
 }

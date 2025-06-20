@@ -2,7 +2,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Sparkles, Code, Tag } from "lucide-react";
+import { Plus, Search, Sparkles, Code, Tag, Trash2 } from "lucide-react";
+import { deleteSnippet } from "@/actions";
 
 interface Snippet {
   id: number;
@@ -14,6 +15,7 @@ interface Snippet {
 export default function SnippetListClient({ snippets }: { snippets: Snippet[] }) {
   const [search, setSearch] = useState("");
   const [tagFilter, setTagFilter] = useState("");
+  const [deletingIds, setDeletingIds] = useState<Set<number>>(new Set());
   
   // Parse tags from JSON strings and get all unique tags
   const allTags = Array.from(
@@ -43,6 +45,35 @@ export default function SnippetListClient({ snippets }: { snippets: Snippet[] })
     );
   });
   
+  const handleDelete = async (snippetId: number) => {
+    if (!confirm("Are you sure you want to delete this snippet? This action cannot be undone.")) {
+      return;
+    }
+    
+    setDeletingIds(prev => new Set(prev).add(snippetId));
+    try {
+      const result = await deleteSnippet(snippetId);
+      if (result && result.message) {
+        // If there's an error message, show it
+        alert(result.message);
+        setDeletingIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(snippetId);
+          return newSet;
+        });
+      }
+      // If no result or no message, the redirect should happen automatically
+    } catch (error) {
+      console.error("Error deleting snippet:", error);
+      alert("Failed to delete snippet. Please try again.");
+      setDeletingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(snippetId);
+        return newSet;
+      });
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-8 space-y-8 relative">
       {/* Animated Background Particles */}
@@ -143,11 +174,22 @@ export default function SnippetListClient({ snippets }: { snippets: Snippet[] })
                       <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate max-w-xs group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {snippet.title}
                       </h3>
-                      <Link href={`/snippet/${snippet.id}`}>
-                        <Button variant="outline" className="text-sm glossy-btn animate-pulse-glow">
-                          View
-                        </Button>
-                      </Link>
+                      <div className="flex gap-2">
+                        <Link href={`/snippet/${snippet.id}`}>
+                          <Button variant="outline" className="text-sm glossy-btn animate-pulse-glow">
+                            View
+                          </Button>
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(snippet.id)}
+                          disabled={deletingIds.has(snippet.id)}
+                          className="text-sm px-3 py-1 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 hover:text-red-700 dark:hover:text-red-300 transition-all duration-200 disabled:opacity-50 flex items-center gap-1 group"
+                          title="Delete snippet"
+                        >
+                          <Trash2 size={14} className="group-hover:scale-110 transition-transform" />
+                          {deletingIds.has(snippet.id) ? "..." : ""}
+                        </button>
+                      </div>
                     </div>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
